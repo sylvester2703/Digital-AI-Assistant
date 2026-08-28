@@ -9,6 +9,9 @@ import {
   Briefcase,
   CheckCircle2,
   PieChart as PieIcon,
+  Zap,
+  Activity,
+  Layers,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -56,62 +59,69 @@ export default function AnalyticsPage() {
     : [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Analytics & Productive Insights</h1>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          Real metrics derived from your database activity, academic progression, and career pipeline
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-foreground">Analytics & Performance Insights</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Real metrics derived from your database activity, academic progression, and career pipeline
+          </p>
+        </div>
+        <Badge variant="indigo" dot className="text-[10px] py-1 px-3 w-fit shadow-sm">
+          Live Database Telemetry
+        </Badge>
       </div>
 
       {/* Top Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card>
+        <Card className="hover:border-primary/40 hover:-translate-y-1 transition-all group shadow-sm">
           <CardContent className="p-5 flex items-center justify-between">
-            <div>
-              <p className="text-xs font-medium text-muted-foreground">Total Applications</p>
-              <h3 className="text-2xl font-bold mt-1 text-primary">
+            <div className="space-y-1">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider text-[10px]">Total Applications</p>
+              <h3 className="text-2xl font-extrabold text-primary font-mono tracking-tight">
                 {trends?.career_funnel
                   ? (Object.values(trends.career_funnel) as number[]).reduce((a, b) => a + b, 0)
                   : 0}
               </h3>
-              <p className="text-[11px] text-muted-foreground mt-0.5">Active pipeline tracking</p>
+              <p className="text-[11px] text-muted-foreground font-medium flex items-center gap-1">
+                <TrendingUp className="w-3 h-3 text-emerald-400" /> Active career pipeline
+              </p>
             </div>
-            <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <div className="h-11 w-11 rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
               <Briefcase className="w-5 h-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="hover:border-emerald-500/40 hover:-translate-y-1 transition-all group shadow-sm">
           <CardContent className="p-5 flex items-center justify-between">
-            <div>
-              <p className="text-xs font-medium text-muted-foreground">Coursework Completion</p>
-              <h3 className="text-2xl font-bold mt-1 text-emerald-500">
+            <div className="space-y-1">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider text-[10px]">Coursework Completion</p>
+              <h3 className="text-2xl font-extrabold text-emerald-400 font-mono tracking-tight">
                 {trends?.academic_workload?.completion_rate_percent || 100}%
               </h3>
-              <p className="text-[11px] text-muted-foreground mt-0.5">
+              <p className="text-[11px] text-muted-foreground font-medium">
                 {trends?.academic_workload?.submitted_assignments || 0} of{" "}
-                {trends?.academic_workload?.total_assignments || 0} submitted
+                {trends?.academic_workload?.total_assignments || 0} assignments submitted
               </p>
             </div>
-            <div className="h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+            <div className="h-11 w-11 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
               <GraduationCap className="w-5 h-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="hover:border-indigo-500/40 hover:-translate-y-1 transition-all group shadow-sm">
           <CardContent className="p-5 flex items-center justify-between">
-            <div>
-              <p className="text-xs font-medium text-muted-foreground">Task Completion</p>
-              <h3 className="text-2xl font-bold mt-1 text-indigo-400">
-                {trends?.academic_workload?.active_courses || 4} Enrolled
+            <div className="space-y-1">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider text-[10px]">Active Enrolled Courses</p>
+              <h3 className="text-2xl font-extrabold text-indigo-400 font-mono tracking-tight">
+                {trends?.academic_workload?.active_courses || 4} Subjects
               </h3>
-              <p className="text-[11px] text-muted-foreground mt-0.5">Active semester courses</p>
+              <p className="text-[11px] text-muted-foreground font-medium">Spring 2026 Semester</p>
             </div>
-            <div className="h-10 w-10 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center">
+            <div className="h-11 w-11 rounded-2xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
               <CheckCircle2 className="w-5 h-5" />
             </div>
           </CardContent>
@@ -121,27 +131,32 @@ export default function AnalyticsPage() {
       {/* Visual Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Career Pipeline Funnel Chart */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Application Conversion Funnel</CardTitle>
-            <CardDescription>Volume of applications at each hiring pipeline stage</CardDescription>
+        <Card className="shadow-sm">
+          <CardHeader className="p-5 pb-2">
+            <div className="flex items-center gap-2">
+              <Activity className="w-4 h-4 text-primary" />
+              <CardTitle className="text-sm font-extrabold text-foreground">Application Conversion Funnel</CardTitle>
+            </div>
+            <CardDescription className="text-xs">Volume of applications at each hiring stage</CardDescription>
           </CardHeader>
-          <CardContent className="h-64">
+          <CardContent className="p-5 pt-2 h-72">
             {funnelData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={funnelData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
-                  <XAxis dataKey="stage" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
+                <BarChart data={funnelData} margin={{ top: 15, right: 10, left: -20, bottom: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.08} stroke="hsl(var(--foreground))" />
+                  <XAxis dataKey="stage" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                  <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} allowDecimals={false} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "hsl(var(--card))",
                       borderColor: "hsl(var(--border))",
-                      borderRadius: "0.75rem",
+                      borderRadius: "1rem",
                       fontSize: "12px",
+                      boxShadow: "0 10px 25px -5px rgba(0,0,0,0.5)",
+                      color: "hsl(var(--foreground))",
                     }}
                   />
-                  <Bar dataKey="count" fill="#6366f1" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="count" fill="#6366f1" radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -153,12 +168,15 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Task Priority Distribution */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Planner Priority Distribution</CardTitle>
-            <CardDescription>Breakdown of tasks by deterministic urgency</CardDescription>
+        <Card className="shadow-sm">
+          <CardHeader className="p-5 pb-2">
+            <div className="flex items-center gap-2">
+              <PieIcon className="w-4 h-4 text-amber-400" />
+              <CardTitle className="text-sm font-extrabold text-foreground">Planner Priority Distribution</CardTitle>
+            </div>
+            <CardDescription className="text-xs">Breakdown of tasks by deterministic urgency</CardDescription>
           </CardHeader>
-          <CardContent className="h-64">
+          <CardContent className="p-5 pt-2 h-72">
             {taskData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -166,9 +184,9 @@ export default function AnalyticsPage() {
                     data={taskData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={50}
-                    outerRadius={80}
-                    paddingAngle={4}
+                    innerRadius={55}
+                    outerRadius={85}
+                    paddingAngle={5}
                     dataKey="value"
                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                     labelLine={false}
@@ -181,8 +199,10 @@ export default function AnalyticsPage() {
                     contentStyle={{
                       backgroundColor: "hsl(var(--card))",
                       borderColor: "hsl(var(--border))",
-                      borderRadius: "0.75rem",
+                      borderRadius: "1rem",
                       fontSize: "12px",
+                      boxShadow: "0 10px 25px -5px rgba(0,0,0,0.5)",
+                      color: "hsl(var(--foreground))",
                     }}
                   />
                 </PieChart>
@@ -196,27 +216,32 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* In-Demand Skills Frequency */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Market Demand Skills in Your Saved & Matched Roles</CardTitle>
-            <CardDescription>Frequency of skill requirements found across parsed job listings</CardDescription>
+        <Card className="lg:col-span-2 shadow-sm">
+          <CardHeader className="p-5 pb-2">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-emerald-400" />
+              <CardTitle className="text-sm font-extrabold text-foreground">Market Demand Skills in Your Saved & Matched Roles</CardTitle>
+            </div>
+            <CardDescription className="text-xs">Frequency of skill requirements found across parsed job listings</CardDescription>
           </CardHeader>
-          <CardContent className="h-64">
+          <CardContent className="p-5 pt-2 h-72">
             {skillData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={skillData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
-                  <XAxis dataKey="skill" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
+                <BarChart data={skillData} margin={{ top: 15, right: 10, left: -20, bottom: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.08} stroke="hsl(var(--foreground))" />
+                  <XAxis dataKey="skill" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                  <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} allowDecimals={false} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "hsl(var(--card))",
                       borderColor: "hsl(var(--border))",
-                      borderRadius: "0.75rem",
+                      borderRadius: "1rem",
                       fontSize: "12px",
+                      boxShadow: "0 10px 25px -5px rgba(0,0,0,0.5)",
+                      color: "hsl(var(--foreground))",
                     }}
                   />
-                  <Bar dataKey="demand" fill="#10b981" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="demand" fill="#10b981" radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -230,3 +255,4 @@ export default function AnalyticsPage() {
     </div>
   );
 }
+

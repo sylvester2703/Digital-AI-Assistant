@@ -12,6 +12,9 @@ import {
   AlertCircle,
   LayoutGrid,
   List,
+  Sparkles,
+  ArrowRight,
+  Flame,
 } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { Button } from "@/components/ui/Button";
@@ -96,28 +99,28 @@ export default function PlannerPage() {
   };
 
   const kanbanColumns = [
-    { title: "To Do", status: "TODO", badge: "default" },
-    { title: "In Progress", status: "IN_PROGRESS", badge: "high" },
-    { title: "Completed", status: "COMPLETED", badge: "success" },
+    { title: "To Do", status: "TODO", badge: "default" as const },
+    { title: "In Progress", status: "IN_PROGRESS", badge: "high" as const },
+    { title: "Completed", status: "COMPLETED", badge: "success" as const },
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Productivity Planner</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-foreground">Productivity Planner</h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Organize daily focus blocks with deterministic priority rankings
+            Organize daily focus blocks with deterministic priority scoring and duration estimates
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           {/* View Mode Toggle */}
-          <div className="flex items-center p-1 bg-secondary rounded-xl border border-border">
+          <div className="flex items-center p-1 bg-secondary/70 rounded-xl border border-border/80 shadow-inner">
             <button
               onClick={() => setViewMode("list")}
-              className={`p-1.5 rounded-lg text-xs transition-colors ${
-                viewMode === "list" ? "bg-card text-foreground shadow-sm font-semibold" : "text-muted-foreground"
+              className={`p-1.5 rounded-lg text-xs transition-all ${
+                viewMode === "list" ? "bg-card text-foreground shadow-sm font-bold" : "text-muted-foreground hover:text-foreground"
               }`}
               title="List View"
             >
@@ -125,8 +128,8 @@ export default function PlannerPage() {
             </button>
             <button
               onClick={() => setViewMode("kanban")}
-              className={`p-1.5 rounded-lg text-xs transition-colors ${
-                viewMode === "kanban" ? "bg-card text-foreground shadow-sm font-semibold" : "text-muted-foreground"
+              className={`p-1.5 rounded-lg text-xs transition-all ${
+                viewMode === "kanban" ? "bg-card text-foreground shadow-sm font-bold" : "text-muted-foreground hover:text-foreground"
               }`}
               title="Kanban Board"
             >
@@ -134,22 +137,22 @@ export default function PlannerPage() {
             </button>
           </div>
 
-          <Button size="sm" onClick={() => setIsCreateOpen(true)} className="gap-1.5">
+          <Button size="sm" onClick={() => setIsCreateOpen(true)} className="gap-2 font-bold shadow-md shadow-primary/20">
             <Plus className="w-4 h-4" />
             <span>Create Task</span>
           </Button>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex items-center gap-1.5 border-b border-border/80 pb-2 overflow-x-auto">
+      {/* Filter Tabs */}
+      <div className="flex items-center gap-2 border-b border-border/70 pb-2 overflow-x-auto select-none">
         {(["all", "today", "upcoming", "overdue", "completed"] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
               activeTab === tab
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
                 : "text-muted-foreground hover:bg-secondary hover:text-foreground"
             }`}
           >
@@ -162,12 +165,12 @@ export default function PlannerPage() {
       {viewMode === "list" ? (
         <div className="space-y-3">
           {isLoading ? (
-            <p className="text-xs text-muted-foreground text-center py-10">Loading planner tasks...</p>
+            <p className="text-xs text-muted-foreground text-center py-12">Loading planner tasks...</p>
           ) : tasks && tasks.length > 0 ? (
             tasks.map((task) => (
               <div
                 key={task.id}
-                className="p-4 rounded-xl bg-card border border-border flex items-center justify-between gap-4 hover:border-primary/40 transition-all shadow-sm"
+                className="p-4 rounded-2xl bg-card/85 backdrop-blur-sm border border-border/70 flex items-center justify-between gap-4 hover:border-primary/40 hover:-translate-y-0.5 transition-all shadow-sm group"
               >
                 <div className="flex items-start gap-3.5 min-w-0">
                   <button
@@ -177,26 +180,26 @@ export default function PlannerPage() {
                         status: task.status === "COMPLETED" ? "TODO" : "COMPLETED",
                       })
                     }
-                    className={`mt-0.5 h-5 w-5 rounded-md border flex items-center justify-center transition-colors flex-shrink-0 ${
+                    className={`mt-0.5 h-5 w-5 rounded-lg border flex items-center justify-center transition-all flex-shrink-0 ${
                       task.status === "COMPLETED"
-                        ? "bg-emerald-500 border-emerald-500 text-white"
+                        ? "bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-500/25"
                         : "border-muted-foreground/40 hover:border-primary text-transparent hover:text-primary"
                     }`}
                   >
                     <CheckCircle2 className="w-4 h-4" />
                   </button>
-                  <div className="min-w-0">
+                  <div className="min-w-0 space-y-1">
                     <h3
-                      className={`text-sm font-semibold truncate ${
+                      className={`text-xs sm:text-sm font-bold truncate group-hover:text-primary transition-colors ${
                         task.status === "COMPLETED" ? "line-through text-muted-foreground" : "text-foreground"
                       }`}
                     >
                       {task.title}
                     </h3>
                     {task.description && (
-                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{task.description}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-1">{task.description}</p>
                     )}
-                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                       <Badge
                         variant={
                           task.priority === "CRITICAL"
@@ -207,27 +210,33 @@ export default function PlannerPage() {
                             ? "medium"
                             : "low"
                         }
-                        className="text-[10px]"
+                        dot={task.priority === "CRITICAL"}
+                        className="text-[9px] py-0 px-2"
                       >
                         {task.priority} (Score {task.calculated_score})
                       </Badge>
                       {task.due_at && (
                         <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
+                          <Clock className="w-3 h-3 text-muted-foreground" />
                           {formatDate(task.due_at)} {formatTime(task.due_at)}
                         </span>
                       )}
-                      <span className="text-[10px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded font-mono">
+                      {task.estimated_duration_minutes && (
+                        <span className="text-[10px] text-muted-foreground font-mono bg-secondary/80 px-2 py-0.5 rounded-md border border-border/60">
+                          {task.estimated_duration_minutes}m
+                        </span>
+                      )}
+                      <span className="text-[10px] text-muted-foreground bg-secondary/80 px-2 py-0.5 rounded-md border border-border/60 font-mono">
                         {task.source_type}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1 flex-shrink-0">
+                <div className="flex items-center gap-1.5 flex-shrink-0">
                   <button
                     onClick={() => deleteTaskMutation.mutate(task.id)}
-                    className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                    className="p-2 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                     title="Delete task"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -236,11 +245,11 @@ export default function PlannerPage() {
               </div>
             ))
           ) : (
-            <div className="text-center py-16 bg-card rounded-2xl border border-dashed border-border p-6">
-              <CheckSquare className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
-              <h3 className="text-sm font-bold">No tasks in this view</h3>
-              <p className="text-xs text-muted-foreground mt-1">Create a new task to organize your study schedule.</p>
-              <Button size="sm" onClick={() => setIsCreateOpen(true)} className="mt-4">
+            <div className="text-center py-16 bg-card/60 backdrop-blur-sm rounded-3xl border border-dashed border-border p-8 space-y-2">
+              <CheckSquare className="w-10 h-10 text-muted-foreground mx-auto opacity-40 mb-2" />
+              <h3 className="text-sm font-bold text-foreground">No tasks in this view</h3>
+              <p className="text-xs text-muted-foreground">Add a new task to organize your study schedule.</p>
+              <Button size="sm" onClick={() => setIsCreateOpen(true)} className="mt-4 font-bold">
                 Add Task
               </Button>
             </div>
@@ -252,42 +261,43 @@ export default function PlannerPage() {
           {kanbanColumns.map((col) => {
             const colTasks = tasks?.filter((t) => t.status === col.status) || [];
             return (
-              <div key={col.status} className="bg-secondary/40 rounded-2xl border border-border/80 p-4 space-y-3">
+              <div key={col.status} className="bg-secondary/40 rounded-3xl border border-border/70 p-4 space-y-3.5">
                 <div className="flex items-center justify-between pb-2 border-b border-border/60">
-                  <h3 className="text-xs font-bold uppercase tracking-wider">{col.title}</h3>
-                  <Badge variant="neutral" className="text-[10px]">
+                  <h3 className="text-xs font-extrabold uppercase tracking-wider text-foreground">{col.title}</h3>
+                  <Badge variant={col.badge} className="text-[10px] py-0 px-2 font-bold">
                     {colTasks.length}
                   </Badge>
                 </div>
 
-                <div className="space-y-2.5 min-h-[300px]">
+                <div className="space-y-3 min-h-[320px]">
                   {colTasks.map((task) => (
                     <div
                       key={task.id}
-                      className="p-3.5 rounded-xl bg-card border border-border shadow-sm hover:border-primary/40 transition-all space-y-2"
+                      className="p-4 rounded-2xl bg-card border border-border/80 shadow-sm hover:border-primary/40 hover:-translate-y-0.5 transition-all space-y-2.5"
                     >
                       <div className="flex items-start justify-between gap-2">
-                        <span className="text-xs font-semibold text-foreground line-clamp-2">{task.title}</span>
+                        <span className="text-xs font-bold text-foreground line-clamp-2 leading-tight">{task.title}</span>
                         <Badge
                           variant={task.priority === "CRITICAL" ? "critical" : task.priority === "HIGH" ? "high" : "medium"}
-                          className="text-[9px]"
+                          dot={task.priority === "CRITICAL"}
+                          className="text-[9px] py-0 px-1.5"
                         >
                           {task.priority}
                         </Badge>
                       </div>
                       {task.due_at && (
                         <p className="text-[10px] text-muted-foreground flex items-center gap-1">
-                          <Clock className="w-2.5 h-2.5" />
+                          <Clock className="w-3 h-3" />
                           {formatDate(task.due_at)}
                         </p>
                       )}
-                      <div className="pt-2 border-t border-border/40 flex items-center justify-between">
+                      <div className="pt-2 border-t border-border/50 flex items-center justify-between">
                         <span className="text-[9px] text-muted-foreground font-mono">{task.source_type}</span>
-                        <div className="flex gap-1">
+                        <div className="flex gap-1.5 text-[10px] font-bold">
                           {col.status !== "TODO" && (
                             <button
                               onClick={() => updateStatusMutation.mutate({ id: task.id, status: "TODO" })}
-                              className="text-[10px] text-muted-foreground hover:text-foreground"
+                              className="text-muted-foreground hover:text-foreground"
                             >
                               ← To Do
                             </button>
@@ -295,7 +305,7 @@ export default function PlannerPage() {
                           {col.status !== "IN_PROGRESS" && (
                             <button
                               onClick={() => updateStatusMutation.mutate({ id: task.id, status: "IN_PROGRESS" })}
-                              className="text-[10px] text-primary hover:underline font-semibold"
+                              className="text-primary hover:underline"
                             >
                               In Progress
                             </button>
@@ -303,7 +313,7 @@ export default function PlannerPage() {
                           {col.status !== "COMPLETED" && (
                             <button
                               onClick={() => updateStatusMutation.mutate({ id: task.id, status: "COMPLETED" })}
-                              className="text-[10px] text-emerald-500 hover:underline font-semibold"
+                              className="text-emerald-400 hover:underline"
                             >
                               Done →
                             </button>
@@ -320,37 +330,37 @@ export default function PlannerPage() {
       )}
 
       {/* Create Task Dialog */}
-      <Modal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Create New Task">
+      <Modal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Create New Action Task">
         <form onSubmit={handleCreateSubmit} className="space-y-4 text-xs">
           <div>
-            <label className="font-semibold text-foreground block mb-1">Task Title *</label>
+            <label className="font-bold text-foreground block mb-1">Task Title *</label>
             <input
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Complete ML Assignment 3 or Review SQL questions"
-              className="w-full bg-secondary rounded-xl px-3 py-2 text-xs border border-border focus:outline-none focus:ring-2 focus:ring-primary/40"
+              className="w-full bg-secondary rounded-xl px-3.5 py-2.5 text-xs border border-border focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
             />
           </div>
 
           <div>
-            <label className="font-semibold text-foreground block mb-1">Description (Optional)</label>
+            <label className="font-bold text-foreground block mb-1">Description (Optional)</label>
             <textarea
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Add relevant instructions, links, or notes..."
-              className="w-full bg-secondary rounded-xl px-3 py-2 text-xs border border-border focus:outline-none focus:ring-2 focus:ring-primary/40"
+              placeholder="Add relevant instructions, syllabus notes, or links..."
+              className="w-full bg-secondary rounded-xl px-3.5 py-2.5 text-xs border border-border focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="font-semibold text-foreground block mb-1">Priority Level</label>
+              <label className="font-bold text-foreground block mb-1">Priority Level</label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
-                className="w-full bg-secondary rounded-xl px-3 py-2 text-xs border border-border focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
+                className="w-full bg-secondary rounded-xl px-3 py-2.5 text-xs border border-border focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
               >
                 <option value="CRITICAL">Critical (Score 85+)</option>
                 <option value="HIGH">High (Score 70+)</option>
@@ -360,33 +370,33 @@ export default function PlannerPage() {
             </div>
 
             <div>
-              <label className="font-semibold text-foreground block mb-1">Est. Duration (Minutes)</label>
+              <label className="font-bold text-foreground block mb-1">Est. Duration (Minutes)</label>
               <input
                 type="number"
                 min={5}
                 max={480}
                 value={duration}
                 onChange={(e) => setDuration(Number(e.target.value))}
-                className="w-full bg-secondary rounded-xl px-3 py-2 text-xs border border-border focus:outline-none focus:ring-2 focus:ring-primary/40"
+                className="w-full bg-secondary rounded-xl px-3.5 py-2.5 text-xs border border-border focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
               />
             </div>
           </div>
 
           <div>
-            <label className="font-semibold text-foreground block mb-1">Due Date & Time</label>
+            <label className="font-bold text-foreground block mb-1">Due Date & Time</label>
             <input
               type="datetime-local"
               value={dueAt}
               onChange={(e) => setDueAt(e.target.value)}
-              className="w-full bg-secondary rounded-xl px-3 py-2 text-xs border border-border focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
+              className="w-full bg-secondary rounded-xl px-3.5 py-2.5 text-xs border border-border focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground"
             />
           </div>
 
-          <div className="pt-3 border-t border-border/60 flex justify-end gap-2">
+          <div className="pt-3 border-t border-border/60 flex justify-end gap-2.5">
             <Button type="button" variant="outline" size="sm" onClick={() => setIsCreateOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" size="sm" loading={createTaskMutation.isPending}>
+            <Button type="submit" size="sm" loading={createTaskMutation.isPending} className="font-bold">
               Create Task
             </Button>
           </div>
@@ -395,3 +405,4 @@ export default function PlannerPage() {
     </div>
   );
 }
+

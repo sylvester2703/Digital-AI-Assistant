@@ -15,6 +15,7 @@ import {
   DollarSign,
   TrendingUp,
   Layers,
+  ArrowRight,
 } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { Button } from "@/components/ui/Button";
@@ -89,24 +90,29 @@ export default function JobsPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Career Opportunities Hub</h1>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          Deterministic multi-factor matching, skill gap discovery, and legitimate authorized sourcing
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-foreground">Career Opportunities Radar</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Deterministic multi-factor matching, skill gap discovery, and legitimate university sourcing
+          </p>
+        </div>
+        <Badge variant="indigo" dot className="text-[10px] py-1 px-3 w-fit shadow-sm">
+          92% High Match Active
+        </Badge>
       </div>
 
       {/* Role Keyword Tabs */}
-      <div className="flex items-center gap-1.5 border-b border-border pb-2 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-border/70 pb-2 overflow-x-auto select-none">
         {roleKeywords.map((r) => (
           <button
             key={r.value}
             onClick={() => setSelectedRole(r.value)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
               selectedRole === r.value
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
                 : "text-muted-foreground hover:bg-secondary hover:text-foreground"
             }`}
           >
@@ -118,22 +124,22 @@ export default function JobsPage() {
       {/* Search & Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-3" />
+          <Search className="w-4 h-4 text-muted-foreground absolute left-3.5 top-3" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search role title, company, skills (e.g. SQL, Python, Power BI)..."
-            className="w-full bg-card border border-border rounded-xl pl-9 pr-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-sm"
+            placeholder="Search role title, company, skills (e.g. SQL, Python, Power BI, Tableau)..."
+            className="w-full bg-card border border-border/80 rounded-2xl pl-10 pr-4 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-sm text-foreground"
           />
         </div>
 
         <select
           value={selectedWorkMode}
           onChange={(e) => setSelectedWorkMode(e.target.value)}
-          className="bg-card border border-border rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground shadow-sm"
+          className="bg-card border border-border/80 rounded-2xl px-4 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary/40 text-foreground shadow-sm font-semibold"
         >
           <option value="ALL">All Work Modes</option>
-          <option value="REMOTE">Remote</option>
+          <option value="REMOTE">Remote Only</option>
           <option value="HYBRID">Hybrid</option>
           <option value="ONSITE">Onsite</option>
         </select>
@@ -142,59 +148,59 @@ export default function JobsPage() {
       {/* Jobs Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {isLoading ? (
-          <p className="text-xs text-muted-foreground text-center col-span-2 py-12">Computing multi-factor matches...</p>
+          <p className="text-xs text-muted-foreground text-center col-span-2 py-16">Computing multi-factor matches...</p>
         ) : jobs && jobs.length > 0 ? (
           jobs.map((job) => {
             const score = job.match_score || 0;
             return (
               <Card
                 key={job.id}
-                className="hover:border-primary/40 transition-all flex flex-col justify-between group shadow-sm"
+                className="hover:border-primary/50 hover:-translate-y-1 transition-all flex flex-col justify-between group shadow-sm"
               >
                 <CardHeader className="p-5 pb-3">
                   <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-1">
-                      <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider font-mono">
+                    <div className="space-y-1 min-w-0">
+                      <span className="text-[9px] uppercase font-mono font-extrabold text-muted-foreground tracking-wider bg-secondary/80 px-2 py-0.5 rounded border border-border/60 inline-block">
                         {job.source_name}
                       </span>
-                      <CardTitle className="text-base font-bold group-hover:text-primary transition-colors">
+                      <CardTitle className="text-sm sm:text-base font-extrabold group-hover:text-primary transition-colors truncate">
                         {job.title}
                       </CardTitle>
-                      <p className="text-xs text-muted-foreground font-medium flex items-center gap-2">
-                        <span className="text-foreground">{job.company_name}</span>
+                      <p className="text-xs text-muted-foreground font-medium flex items-center gap-2 flex-wrap">
+                        <span className="text-foreground font-bold">{job.company_name}</span>
                         <span>•</span>
-                        <span className="flex items-center gap-0.5">
-                          <MapPin className="w-2.5 h-2.5" />
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3 h-3 text-muted-foreground" />
                           {job.location} ({job.work_mode})
                         </span>
                       </p>
                     </div>
 
-                    {/* Deterministic Match Score Badge */}
-                    <div className="text-center p-2 rounded-xl bg-gradient-to-tr from-primary/10 to-indigo-500/10 border border-primary/30 flex-shrink-0">
-                      <div className="text-sm font-black text-primary font-mono">{score}%</div>
-                      <div className="text-[8px] uppercase tracking-wider font-bold text-primary">Match</div>
+                    {/* Deterministic Match Score Pill */}
+                    <div className="text-center p-2.5 rounded-2xl bg-gradient-to-tr from-primary/15 via-indigo-500/10 to-emerald-500/10 border border-primary/30 flex-shrink-0 shadow-sm">
+                      <div className="text-base font-black text-primary font-mono">{score}%</div>
+                      <div className="text-[8px] uppercase tracking-wider font-extrabold text-primary">Compatibility</div>
                     </div>
                   </div>
                 </CardHeader>
 
-                <CardContent className="p-5 pt-0 space-y-3">
+                <CardContent className="p-5 pt-0 space-y-3.5">
                   <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{job.description}</p>
 
-                  {/* Skills Alignment */}
-                  <div className="space-y-1">
-                    <div className="text-[10px] text-muted-foreground font-semibold flex items-center justify-between">
-                      <span>Skills Match</span>
-                      <span className="text-emerald-500 font-bold">{job.matched_skills.length} matched</span>
+                  {/* Skills Alignment Chips */}
+                  <div className="space-y-1.5">
+                    <div className="text-[10px] text-muted-foreground font-bold flex items-center justify-between">
+                      <span>Skills Compatibility</span>
+                      <span className="text-emerald-400 font-extrabold">{job.matched_skills.length} matched</span>
                     </div>
                     <div className="flex flex-wrap gap-1">
                       {job.matched_skills.map((sk) => (
-                        <span key={sk} className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-medium">
+                        <span key={sk} className="text-[9px] px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
                           ✓ {sk}
                         </span>
                       ))}
                       {job.missing_skills.slice(0, 2).map((sk) => (
-                        <span key={sk} className="text-[9px] px-1.5 py-0.5 rounded bg-secondary text-muted-foreground border border-border">
+                        <span key={sk} className="text-[9px] px-2 py-0.5 rounded-md bg-secondary text-muted-foreground border border-border/80">
                           + {sk}
                         </span>
                       ))}
@@ -202,33 +208,34 @@ export default function JobsPage() {
                   </div>
 
                   {/* Salary & Freshness */}
-                  <div className="pt-2 border-t border-border/40 flex items-center justify-between text-[11px] text-muted-foreground">
-                    <span>
-                      {job.min_salary ? formatCurrency(job.min_salary, job.salary_currency) : "Competitive"}
+                  <div className="pt-2 border-t border-border/50 flex items-center justify-between text-[11px] text-muted-foreground font-mono">
+                    <span className="font-bold text-foreground">
+                      {job.min_salary ? formatCurrency(job.min_salary, job.salary_currency) : "Competitive Pay"}
                     </span>
                     <span>Posted {formatDate(job.posted_at)}</span>
                   </div>
 
                   {/* Actions */}
-                  <div className="pt-2 flex items-center justify-between gap-2">
+                  <div className="pt-2 flex items-center justify-between gap-2.5">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setSelectedJob(job)}
-                      className="text-xs flex-1"
+                      className="text-xs flex-1 font-bold h-9"
                     >
                       View Breakdown
                     </Button>
                     {job.is_applied ? (
-                      <Badge variant="success" className="text-xs px-3 py-1.5 h-8">
-                        Applied ✓
+                      <Badge variant="success" dot className="text-xs px-3.5 py-1.5 h-9 justify-center flex-1 font-bold">
+                        Applied in Pipeline ✓
                       </Badge>
                     ) : (
                       <Button
                         size="sm"
+                        variant="gradient"
                         onClick={() => applyMutation.mutate(job)}
                         loading={applyMutation.isPending}
-                        className="text-xs flex-1 gap-1"
+                        className="text-xs flex-1 gap-1.5 font-bold h-9 shadow-md shadow-primary/20"
                       >
                         <span>Apply & Track</span>
                         <ArrowUpRight className="w-3.5 h-3.5" />
@@ -240,8 +247,10 @@ export default function JobsPage() {
             );
           })
         ) : (
-          <div className="text-center py-16 col-span-2 text-xs text-muted-foreground bg-card rounded-2xl border border-dashed border-border p-6">
-            No job matches found matching your filters.
+          <div className="text-center py-16 col-span-2 text-xs text-muted-foreground bg-card/60 backdrop-blur-sm rounded-3xl border border-dashed border-border p-8 space-y-2">
+            <Briefcase className="w-10 h-10 mx-auto opacity-40 text-muted-foreground mb-2" />
+            <h3 className="text-sm font-bold text-foreground">No jobs matching your query</h3>
+            <p className="text-xs text-muted-foreground">Try clearing search filters or selecting All Roles.</p>
           </div>
         )}
       </div>
@@ -256,28 +265,28 @@ export default function JobsPage() {
         >
           <div className="space-y-4 text-xs">
             {/* Match Score Banner */}
-            <div className="p-4 rounded-xl bg-gradient-to-r from-primary/10 to-indigo-500/10 border border-primary/30 flex items-center justify-between">
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-primary/15 via-indigo-500/10 to-emerald-500/10 border border-primary/30 flex items-center justify-between">
               <div>
-                <span className="text-base font-bold text-primary">{selectedJob.match_score}% Compatibility Score</span>
-                <p className="text-[11px] text-muted-foreground mt-0.5">Calculated using deterministic multi-factor weighting</p>
+                <span className="text-base font-extrabold text-primary">{selectedJob.match_score}% Compatibility Score</span>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Calculated using deterministic multi-factor profile weighting</p>
               </div>
-              <Badge variant="high" className="text-xs px-2.5 py-1">
+              <Badge variant="success" dot className="text-xs px-3 py-1 font-bold">
                 Strong Fit
               </Badge>
             </div>
 
             {/* Rationale */}
             {selectedJob.match_rationale && (
-              <div className="p-3 rounded-xl bg-secondary/50 border border-border space-y-1">
-                <span className="font-bold text-foreground block">Match Rationale</span>
+              <div className="p-3.5 rounded-2xl bg-secondary/60 border border-border/80 space-y-1">
+                <span className="font-bold text-foreground block">Match Analysis</span>
                 <p className="text-muted-foreground leading-relaxed">{selectedJob.match_rationale}</p>
               </div>
             )}
 
             {/* Skills Comparison */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20 space-y-2">
-                <span className="font-bold text-emerald-500 block">Matched Skills ({selectedJob.matched_skills.length})</span>
+              <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 space-y-2">
+                <span className="font-bold text-emerald-400 block">Matched Skills ({selectedJob.matched_skills.length})</span>
                 <div className="flex flex-wrap gap-1">
                   {selectedJob.matched_skills.map((s) => (
                     <Badge key={s} variant="success" className="text-[10px]">
@@ -287,11 +296,11 @@ export default function JobsPage() {
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-amber-500/5 border border-amber-500/20 space-y-2">
-                <span className="font-bold text-amber-500 block">Missing Skills ({selectedJob.missing_skills.length})</span>
+              <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 space-y-2">
+                <span className="font-bold text-amber-400 block">Missing Skills ({selectedJob.missing_skills.length})</span>
                 <div className="flex flex-wrap gap-1">
                   {selectedJob.missing_skills.map((s) => (
-                    <Badge key={s} variant="high" className="text-[10px]">
+                    <Badge key={s} variant="amber" className="text-[10px]">
                       {s}
                     </Badge>
                   ))}
@@ -301,20 +310,20 @@ export default function JobsPage() {
 
             {/* Job Description */}
             <div className="space-y-1">
-              <span className="font-bold text-foreground block">Full Job Description</span>
-              <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto p-3 bg-secondary/30 rounded-xl border border-border">
+              <span className="font-bold text-foreground block">Job Description</span>
+              <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto p-3.5 bg-secondary/40 rounded-2xl border border-border text-xs">
                 {selectedJob.description}
               </p>
             </div>
 
             {/* Action buttons */}
-            <div className="pt-3 border-t border-border flex items-center justify-between">
-              <Button variant="outline" size="sm" onClick={() => saveJobMutation.mutate(selectedJob)}>
+            <div className="pt-3 border-t border-border/60 flex items-center justify-between gap-3">
+              <Button variant="outline" size="sm" onClick={() => saveJobMutation.mutate(selectedJob)} className="font-bold">
                 <Bookmark className="w-3.5 h-3.5 mr-1" />
-                <span>Save for Later</span>
+                <span>Save Lead</span>
               </Button>
-              <Button size="sm" onClick={() => applyMutation.mutate(selectedJob)}>
-                <span>Track Application in Pipeline</span>
+              <Button size="sm" variant="gradient" onClick={() => applyMutation.mutate(selectedJob)} className="font-bold">
+                <span>Add to Application Pipeline</span>
                 <ArrowUpRight className="w-3.5 h-3.5 ml-1" />
               </Button>
             </div>
@@ -324,3 +333,4 @@ export default function JobsPage() {
     </div>
   );
 }
+

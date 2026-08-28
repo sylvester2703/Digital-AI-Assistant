@@ -5,7 +5,8 @@ export function Card({ className, children, ...props }: React.HTMLAttributes<HTM
   return (
     <div
       className={cn(
-        "bg-card text-card-foreground rounded-xl border border-border/80 shadow-sm transition-all",
+        "relative bg-card/80 backdrop-blur-sm text-card-foreground rounded-2xl border border-border/70 shadow-sm transition-all duration-200 overflow-hidden",
+        "before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/25 before:to-transparent",
         className
       )}
       {...props}
@@ -17,7 +18,7 @@ export function Card({ className, children, ...props }: React.HTMLAttributes<HTM
 
 export function CardHeader({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("p-5 pb-3 flex flex-col space-y-1", className)} {...props}>
+    <div className={cn("p-5 pb-3 flex flex-col space-y-1.5", className)} {...props}>
       {children}
     </div>
   );
@@ -25,7 +26,7 @@ export function CardHeader({ className, children, ...props }: React.HTMLAttribut
 
 export function CardTitle({ className, children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
-    <h3 className={cn("text-base font-semibold leading-none tracking-tight", className)} {...props}>
+    <h3 className={cn("text-base font-bold leading-tight tracking-tight text-foreground", className)} {...props}>
       {children}
     </h3>
   );
@@ -33,7 +34,7 @@ export function CardTitle({ className, children, ...props }: React.HTMLAttribute
 
 export function CardDescription({ className, children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
-    <p className={cn("text-xs text-muted-foreground pt-1", className)} {...props}>
+    <p className={cn("text-xs text-muted-foreground leading-relaxed", className)} {...props}>
       {children}
     </p>
   );
@@ -54,3 +55,4 @@ export function CardFooter({ className, children, ...props }: React.HTMLAttribut
     </div>
   );
 }
+

@@ -13,6 +13,9 @@ import {
   ExternalLink,
   ShieldCheck,
   Calendar,
+  Layers,
+  ArrowRight,
+  CheckCircle2,
 } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { Button } from "@/components/ui/Button";
@@ -45,37 +48,43 @@ export default function InboxPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["emails"] });
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-metrics"] });
     },
   });
 
   const categories = [
-    { label: "All Inbox", value: "ALL" },
+    { label: "All Messages", value: "ALL" },
     { label: "Interviews", value: "INTERVIEW" },
-    { label: "Opportunities", value: "JOB_OPPORTUNITY" },
+    { label: "Career Leads", value: "JOB_OPPORTUNITY" },
     { label: "Assignments", value: "ASSIGNMENT" },
     { label: "Exams", value: "EXAM" },
-    { label: "College", value: "COLLEGE" },
+    { label: "University", value: "COLLEGE" },
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Inbox & Email Intelligence</h1>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          Deterministic extraction of interview invites, deadlines, and actionable tasks with confidence safety
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-foreground">Inbox & Intelligence Center</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Automated fact extraction for interview invites, coursework deadlines, and recruiter follow-ups
+          </p>
+        </div>
+        <Badge variant="indigo" dot className="text-[10px] py-1 px-3 w-fit shadow-sm">
+          AI Fact Extractor Active
+        </Badge>
       </div>
 
-      {/* Category Pills */}
-      <div className="flex items-center gap-1.5 border-b border-border pb-2 overflow-x-auto">
+      {/* Category Filter Pills */}
+      <div className="flex items-center gap-2 border-b border-border/70 pb-2 overflow-x-auto select-none">
         {categories.map((cat) => (
           <button
             key={cat.value}
             onClick={() => setSelectedCategory(cat.value)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
               selectedCategory === cat.value
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
                 : "text-muted-foreground hover:bg-secondary hover:text-foreground"
             }`}
           >
@@ -87,9 +96,9 @@ export default function InboxPage() {
       {/* Dual Pane Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Pane: Email List (5 cols) */}
-        <div className="lg:col-span-5 space-y-2.5">
+        <div className="lg:col-span-5 space-y-3">
           {isLoading ? (
-            <p className="text-xs text-muted-foreground text-center py-10">Syncing inbox messages...</p>
+            <p className="text-xs text-muted-foreground text-center py-12">Syncing inbox messages...</p>
           ) : emails && emails.length > 0 ? (
             emails.map((email) => {
               const isSelected = selectedEmail?.id === email.id;
@@ -97,36 +106,37 @@ export default function InboxPage() {
                 <div
                   key={email.id}
                   onClick={() => setSelectedEmailId(email.id)}
-                  className={`p-4 rounded-xl border cursor-pointer transition-all text-xs space-y-1.5 ${
+                  className={`p-4 rounded-2xl border cursor-pointer transition-all text-xs space-y-2 select-none ${
                     isSelected
-                      ? "bg-primary/10 border-primary/40 shadow-sm"
-                      : "bg-card border-border hover:border-border/80 hover:bg-secondary/40"
+                      ? "bg-card border-primary/50 shadow-md shadow-primary/10 ring-1 ring-primary/40 -translate-y-0.5"
+                      : "bg-secondary/40 border-border/70 hover:border-border hover:bg-secondary/70"
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-bold text-foreground truncate">{email.sender_name || email.sender_email}</span>
-                    <span className="text-[10px] text-muted-foreground flex-shrink-0">{formatDate(email.received_at)}</span>
+                    <span className="text-[10px] text-muted-foreground font-mono flex-shrink-0">{formatDate(email.received_at)}</span>
                   </div>
-                  <h3 className="font-semibold text-foreground text-xs truncate leading-snug">{email.subject}</h3>
-                  <p className="text-[11px] text-muted-foreground line-clamp-1">{email.snippet}</p>
+                  <h3 className="font-bold text-foreground text-xs truncate leading-snug">{email.subject}</h3>
+                  <p className="text-[11px] text-muted-foreground line-clamp-1 leading-normal">{email.snippet}</p>
 
-                  <div className="pt-1 flex items-center justify-between">
+                  <div className="pt-1.5 flex items-center justify-between">
                     <Badge
                       variant={
                         email.category === "INTERVIEW"
                           ? "critical"
                           : email.category === "ASSIGNMENT"
                           ? "high"
-                          : "neutral"
+                          : "indigo"
                       }
-                      className="text-[9px]"
+                      dot={email.category === "INTERVIEW"}
+                      className="text-[9px] py-0 px-2"
                     >
                       {email.category}
                     </Badge>
                     {email.is_actionable && (
-                      <span className="text-[10px] text-primary font-semibold flex items-center gap-1">
-                        <Sparkles className="w-2.5 h-2.5" />
-                        Action Detected
+                      <span className="text-[10px] text-primary font-bold flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-primary animate-spin-slow" />
+                        Action Extracted
                       </span>
                     )}
                   </div>
@@ -134,8 +144,9 @@ export default function InboxPage() {
               );
             })
           ) : (
-            <div className="text-center py-12 bg-card rounded-xl border border-dashed border-border p-6 text-xs text-muted-foreground">
-              No emails found in this category.
+            <div className="text-center py-16 bg-card/60 backdrop-blur-sm rounded-3xl border border-dashed border-border p-6 text-xs text-muted-foreground">
+              <Mail className="w-8 h-8 mx-auto mb-2 opacity-40 text-muted-foreground" />
+              <p className="font-bold text-foreground">No emails found in this category.</p>
             </div>
           )}
         </div>
@@ -146,43 +157,43 @@ export default function InboxPage() {
             <div className="space-y-4">
               {/* Extracted Facts Card (AI Safety Layer) */}
               {selectedEmail.extracted_facts && selectedEmail.extracted_facts.length > 0 && (
-                <Card className="border-primary/30 bg-gradient-to-r from-card to-primary/5">
+                <Card className="border-primary/40 bg-gradient-to-br from-card via-card to-primary/5 shadow-md shadow-primary/5">
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Sparkles className="w-4 h-4 text-primary" />
-                        <CardTitle className="text-sm">Structured Extracted Intelligence</CardTitle>
+                        <CardTitle className="text-sm">Structured AI Intelligence</CardTitle>
                       </div>
-                      <Badge variant="default" className="text-[9px]">
-                        AI Safety Grounded
+                      <Badge variant="indigo" dot className="text-[9px] py-0.5 px-2">
+                        Deterministic Grounding
                       </Badge>
                     </div>
-                    <CardDescription>
-                      Facts extracted with confidence scores. Review and convert into planner tasks with full user control.
+                    <CardDescription className="text-xs">
+                      Extracted actionable facts with evidence citations. One-click conversion to planner tasks.
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-2.5">
+                  <CardContent className="space-y-3 pt-1">
                     {selectedEmail.extracted_facts.map((fact: ExtractedFact) => (
                       <div
                         key={fact.id}
-                        className="p-3 rounded-xl bg-card border border-border/80 flex items-center justify-between gap-3 text-xs"
+                        className="p-3.5 rounded-2xl bg-secondary/60 border border-border/80 flex items-center justify-between gap-3 text-xs"
                       >
                         <div className="space-y-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono text-[10px] text-primary font-bold">{fact.fact_type}</span>
-                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-secondary text-muted-foreground">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-mono text-[10px] text-primary font-extrabold uppercase">{fact.fact_type}</span>
+                            <span className="text-[9px] px-2 py-0.5 rounded-md bg-card border border-border text-muted-foreground font-mono">
                               {fact.fact_nature} • {Math.round(fact.confidence * 100)}% Confidence
                             </span>
                           </div>
-                          <p className="font-medium text-foreground text-xs">{fact.value}</p>
+                          <p className="font-bold text-foreground text-xs">{fact.value}</p>
                           {fact.evidence && (
-                            <p className="text-[10px] text-muted-foreground italic">"{fact.evidence}"</p>
+                            <p className="text-[10px] text-muted-foreground italic line-clamp-2">"{fact.evidence}"</p>
                           )}
                         </div>
 
                         {fact.converted_to_task ? (
-                          <Badge variant="success" className="gap-1 flex-shrink-0 text-[10px]">
-                            <CheckCircle className="w-3 h-3" />
+                          <Badge variant="success" dot className="gap-1 flex-shrink-0 text-[10px] py-1 px-2.5">
+                            <CheckCircle2 className="w-3 h-3" />
                             <span>In Planner</span>
                           </Badge>
                         ) : (
@@ -190,10 +201,10 @@ export default function InboxPage() {
                             size="sm"
                             onClick={() => convertFactMutation.mutate(fact.id)}
                             loading={convertFactMutation.isPending}
-                            className="text-[11px] h-7 px-2.5 gap-1 flex-shrink-0"
+                            className="text-[11px] h-8 px-3 gap-1.5 flex-shrink-0 font-bold"
                           >
-                            <Plus className="w-3 h-3" />
-                            <span>Add Task</span>
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>Add to Tasks</span>
                           </Button>
                         )}
                       </div>
@@ -205,18 +216,18 @@ export default function InboxPage() {
               {/* Message Body Card */}
               <Card>
                 <CardHeader className="border-b border-border/60 pb-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="text-base font-bold tracking-tight text-foreground">{selectedEmail.subject}</h2>
-                      <div className="text-xs text-muted-foreground mt-1 flex items-center gap-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="space-y-1">
+                      <h2 className="text-base font-extrabold tracking-tight text-foreground">{selectedEmail.subject}</h2>
+                      <div className="text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
                         <span>
                           From: <strong className="text-foreground">{selectedEmail.sender_name}</strong> &lt;{selectedEmail.sender_email}&gt;
                         </span>
                         <span>•</span>
-                        <span>{formatDate(selectedEmail.received_at)} {formatTime(selectedEmail.received_at)}</span>
+                        <span className="font-mono">{formatDate(selectedEmail.received_at)} {formatTime(selectedEmail.received_at)}</span>
                       </div>
                     </div>
-                    <Badge variant={selectedEmail.category === "INTERVIEW" ? "critical" : "neutral"}>
+                    <Badge variant={selectedEmail.category === "INTERVIEW" ? "critical" : "indigo"} className="text-[10px] py-0.5 px-2">
                       {selectedEmail.category}
                     </Badge>
                   </div>
@@ -227,7 +238,7 @@ export default function InboxPage() {
               </Card>
             </div>
           ) : (
-            <Card className="p-12 text-center text-xs text-muted-foreground">
+            <Card className="p-16 text-center text-xs text-muted-foreground">
               Select an email on the left to review parsed details and extracted facts.
             </Card>
           )}
