@@ -1,16 +1,36 @@
 function getBaseUrl(): string {
-  let envUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1";
-  
-  // If only a hostname is passed (e.g., from Render service host)
-  if (envUrl && !envUrl.startsWith("http://") && !envUrl.startsWith("https://")) {
-    envUrl = `https://${envUrl}`;
+  // In the browser, always use relative "/api/v1" so Next.js server proxies seamlessly to the backend
+  if (typeof window !== "undefined") {
+    const publicUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (publicUrl && (publicUrl.startsWith("http://localhost") || (publicUrl.startsWith("https://") && publicUrl.includes(".")))) {
+      let cleanUrl = publicUrl.trim();
+      if (!cleanUrl.endsWith("/api/v1") && !cleanUrl.endsWith("/api/v1/")) {
+        cleanUrl = `${cleanUrl.replace(/\/+$/, "")}/api/v1`;
+      }
+      return cleanUrl;
+    }
+    return "/api/v1";
   }
-  
-  // Ensure the /api/v1 prefix exists
-  if (envUrl && !envUrl.endsWith("/api/v1") && !envUrl.endsWith("/api/v1/")) {
+
+  // Server-side (SSR):
+  let envUrl =
+    process.env.BACKEND_URL ||
+    process.env.BACKEND_INTERNAL_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    "http://127.0.0.1:8000/api/v1";
+
+  if (!envUrl.startsWith("http://") && !envUrl.startsWith("https://")) {
+    if (envUrl.includes(".onrender.com")) {
+      envUrl = `https://${envUrl}`;
+    } else {
+      envUrl = `http://${envUrl}`;
+    }
+  }
+
+  if (!envUrl.endsWith("/api/v1") && !envUrl.endsWith("/api/v1/")) {
     envUrl = `${envUrl.replace(/\/+$/, "")}/api/v1`;
   }
-  
+
   return envUrl;
 }
 
@@ -45,11 +65,13 @@ export async function apiClient<T>(
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const url = endpoint.startsWith("http") ? endpoint : `${BASE_URL}${endpoint}`;
+  const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const url = endpoint.startsWith("http") ? endpoint : `${BASE_URL}${cleanEndpoint}`;
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    // 60 seconds timeout to accommodate Render free-tier instance cold start
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
 
     const response = await fetch(url, {
       ...options,

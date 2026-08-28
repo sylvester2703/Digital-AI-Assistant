@@ -34,9 +34,15 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 18.20.0
+      - key: BACKEND_INTERNAL_URL
+        fromService:
+          type: web
+          name: digital-ai-assistant-backend
+          property: host
       - key: NEXT_PUBLIC_API_URL
         fromService:
           type: web
           name: digital-ai-assistant-backend
           property: host
+
 
