@@ -23,9 +23,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchUser = async () => {
     try {
+      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      if (!token) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
       const data = await apiClient<User>("/auth/me");
       setUser(data);
     } catch {
+      localStorage.removeItem("token");
       setUser(null);
     } finally {
       setLoading(false);

@@ -60,10 +60,17 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS
+# Dynamic CORS Configuration
+allowed_origins = list(settings.CORS_ORIGINS)
+if settings.FRONTEND_ORIGIN:
+    if settings.FRONTEND_ORIGIN == "*":
+        allowed_origins = ["*"]
+    elif settings.FRONTEND_ORIGIN not in allowed_origins:
+        allowed_origins.append(settings.FRONTEND_ORIGIN)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=allowed_origins if "*" not in allowed_origins else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

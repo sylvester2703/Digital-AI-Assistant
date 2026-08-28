@@ -1,4 +1,20 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1";
+function getBaseUrl(): string {
+  let envUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1";
+  
+  // If only a hostname is passed (e.g., from Render service host)
+  if (envUrl && !envUrl.startsWith("http://") && !envUrl.startsWith("https://")) {
+    envUrl = `https://${envUrl}`;
+  }
+  
+  // Ensure the /api/v1 prefix exists
+  if (envUrl && !envUrl.endsWith("/api/v1") && !envUrl.endsWith("/api/v1/")) {
+    envUrl = `${envUrl.replace(/\/+$/, "")}/api/v1`;
+  }
+  
+  return envUrl;
+}
+
+const BASE_URL = getBaseUrl();
 
 export class ApiError extends Error {
   code: string;
@@ -32,11 +48,16 @@ export async function apiClient<T>(
   const url = endpoint.startsWith("http") ? endpoint : `${BASE_URL}${endpoint}`;
 
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     const response = await fetch(url, {
       ...options,
       headers,
       credentials: "include",
+      signal: options.signal || controller.signal,
     });
+    clearTimeout(timeoutId);
 
     if (response.status === 204) {
       return {} as T;
