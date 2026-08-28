@@ -10,8 +10,18 @@ const nextConfig = {
 
     let target = rawBackendUrl.trim();
 
-    // If protocol is missing, determine protocol
-    if (!target.startsWith("http://") && !target.startsWith("https://")) {
+    // If it is a Render service name without onrender.com and not localhost
+    if (
+      !target.includes(".onrender.com") &&
+      !target.includes("localhost") &&
+      !target.includes("127.0.0.1") &&
+      !target.startsWith("http://") &&
+      !target.startsWith("https://")
+    ) {
+      // Remove any internal port like :10000
+      const hostOnly = target.split(":")[0];
+      target = `https://${hostOnly}.onrender.com`;
+    } else if (!target.startsWith("http://") && !target.startsWith("https://")) {
       if (target.includes(".onrender.com")) {
         target = `https://${target}`;
       } else {
@@ -32,5 +42,6 @@ const nextConfig = {
 };
 
 export default nextConfig;
+
 
 

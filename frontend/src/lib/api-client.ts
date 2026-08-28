@@ -85,14 +85,30 @@ export async function apiClient<T>(
       return {} as T;
     }
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      const err = data.error || { message: "Request failed", code: "UNKNOWN_ERROR" };
-      throw new ApiError(err.message || data.detail || "Server error", err.code, response.status, err.details);
+    let data: any = null;
+    const contentType = response.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
+    } else {
+      const text = await response.text().catch(() => "");
+      data = { message: text || `Server responded with status ${response.status}` };
     }
 
-    return data as T;
+    if (!response.ok) {
+      const msg =
+        data?.error?.message ||
+        data?.message ||
+        data?.detail ||
+        `Server error (${response.status})`;
+      const code = data?.error?.code || data?.code || "API_ERROR";
+      throw new ApiError(msg, code, response.status, data?.error?.details || data?.details);
+    }
+
+    return (data || {}) as T;
   } catch (error: any) {
     if (error instanceof ApiError) {
       throw error;
